@@ -19,82 +19,89 @@ const App = () => {
     };
 
     const Statistic = ({ text, value }) => {
-      const valueFixed = value.toFixed(2);
-      
-      if (text === "average") {
-          return (
-              <p>{text} {valueFixed}</p>
-          );
-      }
+        const valueFixed = value.toFixed(2);
+        
+        if (text === "average") {
+            return (
+                <p>{text} {valueFixed}</p>
+            );
+        }
 
-      if (text === "positive") {
-          return (
-              <p>{text} {valueFixed} %</p>
-          );
-      }
-  
-      return (
-          <p>{text} {value}</p>
-      );
-  }
+        if (text === "positive") {
+            return (
+                <p>{text} {valueFixed} %</p>
+            );
+        }
+    
+        return (
+            <p>{text} {value}</p>
+        );
+    }
 
-  const Statistics = ({ good, neutral, bad }) => {
-    if (good + bad + neutral === 0) {
+    const Statistics = ({ good, neutral, bad }) => {
+        if (good + bad + neutral === 0) {
+            return (
+                <div>
+                    No feedback given
+                </div>
+            );
+        }
+
         return (
             <div>
-                No feedback given
+                <Statistic
+                    text="good" 
+                    value={good} 
+                />
+                <Statistic
+                    text="neutral" 
+                    value={neutral} 
+                />
+                <Statistic
+                    text="bad" 
+                    value={bad} 
+                />
+                <Statistic
+                    text="all" 
+                    value={good + neutral + bad} 
+                />
+                <Statistic
+                    text="average" 
+                    value={(good * 1 + bad * - 1 ) / (good + neutral + bad)} 
+                />
+                <Statistic
+                    text="positive" 
+                    value={good * (100 / (good + neutral + bad))} 
+                />
             </div>
+        );
+    }
+
+    const Button = ({ onClick, text }) => {
+        return (
+            <button
+                onClick={onClick}
+            >
+                {text}
+            </button>
         );
     }
 
     return (
         <div>
-            <Statistic
-                text="good" 
-                value={good} 
-            />
-            <Statistic
-                text="neutral" 
-                value={neutral} 
-            />
-            <Statistic
-                text="bad" 
-                value={bad} 
-            />
-            <Statistic
-                text="all" 
-                value={good + neutral + bad} 
-            />
-            <Statistic
-                text="average" 
-                value={(good * 1 + bad * - 1 ) / (good + neutral + bad)} 
-            />
-            <Statistic
-                text="positive" 
-                value={good * (100 / (good + neutral + bad))} 
-            />
-        </div>
-    );
-}
-
-    return (
-        <div>
             <h1>give feedback</h1>
-            <button
-                text="good"
+            <Button
                 onClick={goodClick}
-            >good
-            </button>
-            <button
-                text="neutral"
+                text='good'
+            />
+            <Button
                 onClick={neutralClick}
-            >neutral
-            </button>
-            <button
-                text="bad"
+                text='neutral'
+            />
+            <Button
                 onClick={badClick}
-            >bad
-            </button>
+                text='bad'
+            />
             <h1>statistics</h1>
             <Statistics
                 good={good}
