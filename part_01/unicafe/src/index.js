@@ -18,44 +18,37 @@ const App = () => {
         setBad(bad + 1);
     };
 
-    const Statistic = ({ text, value }) => {        
-      const valueFixed = value.toFixed(2);            
+    const Statistic = ({ text, value }) => {
+      const valueFixed = value.toFixed(2);
       
       if (text === "average") {
           return (
               <p>{text} {valueFixed}</p>
           );
       }
+
       if (text === "positive") {
           return (
               <p>{text} {valueFixed} %</p>
           );
-      }        
+      }
   
       return (
           <p>{text} {value}</p>
       );
   }
-  
+
+  const Statistics = ({ good, neutral, bad }) => {
+    if (good + bad + neutral === 0) {
+        return (
+            <div>
+                No feedback given
+            </div>
+        );
+    }
+
     return (
         <div>
-            <h1>give feedback</h1>
-            <button
-                text="good"
-                onClick={goodClick}
-            >good
-            </button>
-            <button
-                text="neutral"
-                onClick={neutralClick}
-            >neutral
-            </button>
-            <button
-                text="bad"
-                onClick={badClick}
-            >bad
-            </button>
-            <h1>statistics</h1>
             <Statistic
                 text="good" 
                 value={good} 
@@ -79,6 +72,34 @@ const App = () => {
             <Statistic
                 text="positive" 
                 value={good * (100 / (good + neutral + bad))} 
+            />
+        </div>
+    );
+}
+
+    return (
+        <div>
+            <h1>give feedback</h1>
+            <button
+                text="good"
+                onClick={goodClick}
+            >good
+            </button>
+            <button
+                text="neutral"
+                onClick={neutralClick}
+            >neutral
+            </button>
+            <button
+                text="bad"
+                onClick={badClick}
+            >bad
+            </button>
+            <h1>statistics</h1>
+            <Statistics
+                good={good}
+                neutral={neutral}
+                bad={bad}
             />
         </div>
     );
