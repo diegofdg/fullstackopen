@@ -5,7 +5,7 @@ const App = () => {
     const [ good, setGood ] = useState(0);
     const [ neutral, setNeutral ] = useState(0);
     const [ bad, setBad ] = useState(0);
-    
+
     const goodClick = () => {          
         setGood(good + 1);
     };
@@ -18,23 +18,52 @@ const App = () => {
         setBad(bad + 1);
     };
 
+    const Header = ({ name }) => {
+        return (
+            <h1>
+                {name}
+            </h1>
+        );
+    }
+
     const Statistic = ({ text, value }) => {
         const valueFixed = value.toFixed(2);
         
         if (text === "average") {
             return (
-                <p>{text} {valueFixed}</p>
+                <tr>
+                    <td>
+                        {text}
+                    </td>
+                    <td>
+                        {valueFixed}
+                    </td>
+                </tr>
             );
         }
 
         if (text === "positive") {
             return (
-                <p>{text} {valueFixed} %</p>
+                <tr>
+                    <td>
+                        {text}
+                    </td>
+                    <td>
+                        {valueFixed}%
+                    </td>
+                </tr>
             );
         }
     
         return (
-            <p>{text} {value}</p>
+            <tr>
+                <td>
+                    {text}
+                </td>
+                <td>
+                    {value}
+                </td>
+            </tr>
         );
     }
 
@@ -49,30 +78,34 @@ const App = () => {
 
         return (
             <div>
-                <Statistic
-                    text="good" 
-                    value={good} 
-                />
-                <Statistic
-                    text="neutral" 
-                    value={neutral} 
-                />
-                <Statistic
-                    text="bad" 
-                    value={bad} 
-                />
-                <Statistic
-                    text="all" 
-                    value={good + neutral + bad} 
-                />
-                <Statistic
-                    text="average" 
-                    value={(good * 1 + bad * - 1 ) / (good + neutral + bad)} 
-                />
-                <Statistic
-                    text="positive" 
-                    value={good * (100 / (good + neutral + bad))} 
-                />
+                <table>
+                    <tbody>
+                        <Statistic
+                            text="good"
+                            value={good}
+                        />
+                        <Statistic
+                            text="neutral"
+                            value={neutral}
+                        />
+                        <Statistic
+                            text="bad"
+                            value={bad}
+                        />
+                        <Statistic
+                            text="all"
+                            value={good + neutral + bad}
+                        />
+                        <Statistic
+                            text="average"
+                            value={(good * 1 + bad * - 1 ) / (good + neutral + bad)}
+                        />
+                        <Statistic
+                            text="positive"
+                            value={good * (100 / (good + neutral + bad))}
+                        />
+                    </tbody>
+                </table>
             </div>
         );
     }
@@ -89,7 +122,9 @@ const App = () => {
 
     return (
         <div>
-            <h1>give feedback</h1>
+            <Header
+                name='give feedback'
+            />
             <Button
                 onClick={goodClick}
                 text='good'
@@ -102,7 +137,9 @@ const App = () => {
                 onClick={badClick}
                 text='bad'
             />
-            <h1>statistics</h1>
+            <Header
+                name='statistics'
+            />
             <Statistics
                 good={good}
                 neutral={neutral}
