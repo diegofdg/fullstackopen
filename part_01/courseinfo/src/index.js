@@ -1,12 +1,12 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 
 const Header = ({ course }) => {
     return (
         <h1>
             {course.name}
         </h1>
-    )
+    );
 }
 
 const Part = ({ part, exercises }) => {
@@ -14,7 +14,7 @@ const Part = ({ part, exercises }) => {
         <p>
             {part} {exercises}
         </p>
-    )
+    );
 }
 
 const Content = ({ parts }) => {
@@ -33,7 +33,7 @@ const Content = ({ parts }) => {
                 exercises={parts[2].exercises}
             />        
         </div>
-    )
+    );
 }
 
 const Total = ({ parts }) => {
@@ -41,7 +41,7 @@ const Total = ({ parts }) => {
       <p>          
           Number of exercises {parts[0].exercises + parts[1].exercises + parts[2].exercises}
       </p>
-  )
+  );
 }
 
 const App = () => {
@@ -75,7 +75,9 @@ const App = () => {
                 parts={course.parts}
             />
         </div>
-    )
+    );
 }
 
-ReactDOM.render(<App />, document.getElementById('root'))
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);

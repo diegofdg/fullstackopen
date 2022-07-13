@@ -1,6 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import App from './App';
+import { createRoot } from 'react-dom/client';
 
 const notes = [
     {
@@ -23,4 +23,8 @@ const notes = [
     }
 ]
 
-ReactDOM.render(<App notes={notes} />, document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App notes={notes} />);
+
+//ReactDOM.render(<App notes={notes} />, document.getElementById('root'));

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 const App = () => {  
     const [ good, setGood ] = useState(0);
@@ -149,4 +149,6 @@ const App = () => {
     );
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);
