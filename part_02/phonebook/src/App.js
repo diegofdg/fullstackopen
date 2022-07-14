@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import Content from './components/Content';
+import Filter from './components/Filter';
+import Person from './components/Person';
 
 const App = () => {
     const [ persons, setPersons ] = useState(
@@ -26,6 +29,7 @@ const App = () => {
     const [ newName, setNewName ] = useState('');
     const [ newNumber, setNewNumber ] = useState('');
     const [ newFilter, setNewFilter ] = useState('');
+    const [ filter, setFilter] = useState(false);
 
     const addPerson = (e) => {
         e.preventDefault();
@@ -48,12 +52,17 @@ const App = () => {
     }
 
     const handleChangeFilter = (e) => {
-        console.log(filteredPersons);
         setNewFilter(e.target.value);
-        const regex = new RegExp( newFilter, 'i' );
-        const filter = () => persons.filter(person => person.name.match(regex));
-        setFilteredPersons(filter);
-    }   
+        if(newFilter.trim().length === 0){
+            setFilteredPersons(persons);
+            setFilter(false);
+        } else {            
+            const regex = new RegExp( newFilter, 'i' );
+            const filter = () => persons.filter(person => person.name.match(regex));
+            setFilteredPersons(filter);            
+            setFilter(true);
+        }
+    }
 
     const handleChangeName = (e) => {     
         setNewName(e.target.value);    
@@ -63,67 +72,36 @@ const App = () => {
         setNewNumber(e.target.value);
     }
 
+    const componente = (filter)
+        ?
+            <Content
+                persons={filteredPersons}
+            />
+        :
+            <Content
+                persons={persons}
+            />
+
     return (
         <div>
             <h2>Phonebook</h2>
-            <div>
-                filter shown with 
-                <input 
-                    value={newFilter} 
-                    onChange={handleChangeFilter} 
-                />
-            </div>
-            <form
-                onSubmit={addPerson}
-            >
-                <h2>add a new</h2>
-                <div>
-                    name:
-                    <input
-                        value={newName} 
-                        onChange={handleChangeName}
-                    />
-                </div>
-                <div>
-                    number: 
-                        <input
-                            value={newNumber} 
-                            onChange={handleChangeNumber}
-                        />
-                </div>
-                <div>
-                    <button 
-                        type="submit"
-                    >
-                        add
-                    </button>
-                </div>
-            </form>
+            <Filter
+                newFilter={newFilter}
+                handleChangeFilter={handleChangeFilter}
+            />
+            
+            <h2>Add a new</h2>
+            <Person
+                addPerson={addPerson}
+                newName={newName}
+                newNumber={newNumber}
+                handleChangeName={handleChangeName}
+                handleChangeNumber={handleChangeNumber}
+            />
+            
             <h2>Numbers</h2>
-            <div>
-                {filteredPersons.length > 0 
-                    ?
-                        <div>
-                            {filteredPersons.map(person => (
-                                <p
-                                    key={person.name}
-                                >
-                                    {person.name} {person.number}                
-                                </p>
-                            ))}
-                        </div>
-                    : 
-                        <div>
-                            {persons.map(person => (
-                                <p
-                                    key={person.name}
-                                >
-                                    {person.name}
-                                </p>
-                            ))}
-                        </div>
-                    }
-            </div>
+            {componente}
+            
         </div>
     );
 }
