@@ -42,6 +42,27 @@ const App = () => {
         }
     }
 
+    const removePerson = (id) => {
+        const person = allPersons.filter(p => p.id === id);        
+        const personName = person[0].name;
+        if (window.confirm(`Delete ${personName} ?`)) {
+            personService
+                .remove(id)
+                .then(
+                    personService
+                        .getAll()
+                        .then(initialPersons => {
+                            setAllPersons(initialPersons);
+                        })
+                )
+                .catch(error => {
+                    console.log(error);
+                    alert(`the person '${personName}' was already deleted from server`);
+                    setAllPersons(allPersons.filter(p => p.id !== id));
+                });
+        }
+    }
+
     const handleChangeFilter = (e) => {
         setNewFilter(e.target.value);
         if(newFilter.trim().length === 0){
@@ -67,10 +88,12 @@ const App = () => {
         ?
             <Content
                 persons={filteredPersons}
+                removePerson={removePerson}
             />
         :
             <Content
                 persons={allPersons}
+                removePerson={removePerson}
             />
 
     return (
