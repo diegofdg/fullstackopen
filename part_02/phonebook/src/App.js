@@ -1,40 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Content from './components/Content';
 import Filter from './components/Filter';
 import Person from './components/Person';
 
 const App = () => {
-    const [ persons, setPersons ] = useState(
-        [
-            { 
-                name: 'Arto Hellas',
-                number: '040-123456'
-            },
-            {
-                name: 'Ada Lovelace',
-                number: '39-44-5323523'
-            },
-            {
-                name: 'Dan Abramov',
-                number: '12-43-234345'
-            },
-            {
-                name: 'Mary Poppendieck',
-                number: '39-23-6423122'
-            }
-        ]
-    );
-
-    const [ filteredPersons, setFilteredPersons ] = useState([]);
+    const [ allPersons, setAllPersons ] = useState([]);
+    const [ filteredPersons, setFilteredPersons ] = useState([allPersons]);
     const [ newName, setNewName ] = useState('');
     const [ newNumber, setNewNumber ] = useState('');
     const [ newFilter, setNewFilter ] = useState('');
     const [ filter, setFilter] = useState(false);
 
+    useEffect(() => {        
+        axios
+          .get('http://localhost:3001/persons')
+          .then(response => {            
+            setAllPersons(response.data);
+          });
+    }, []);
+
     const addPerson = (e) => {
         e.preventDefault();
 
-        const person = persons.filter( p =>
+        const person = allPersons.filter( p =>
             p.name === newName
         );
 
@@ -43,7 +32,7 @@ const App = () => {
                 name: newName,
                 number: newNumber
             }
-            setPersons(persons.concat(newPerson));
+            setAllPersons(allPersons.concat(newPerson));
             setNewName('');
             setNewNumber('');
         } else {
@@ -54,11 +43,11 @@ const App = () => {
     const handleChangeFilter = (e) => {
         setNewFilter(e.target.value);
         if(newFilter.trim().length === 0){
-            setFilteredPersons(persons);
+            setFilteredPersons(allPersons);
             setFilter(false);
         } else {            
             const regex = new RegExp( newFilter, 'i' );
-            const filter = () => persons.filter(person => person.name.match(regex));
+            const filter = () => allPersons.filter(person => person.name.match(regex));
             setFilteredPersons(filter);            
             setFilter(true);
         }
@@ -79,7 +68,7 @@ const App = () => {
             />
         :
             <Content
-                persons={persons}
+                persons={allPersons}
             />
 
     return (
