@@ -18,7 +18,7 @@ const Filter = ({ newFilter, handleFilterChange, handleSearch }) => {
     );
 }
 
-const Content = ({ countries }) => {
+const Content = ({ countries, setCountries }) => {
     if (countries.length > 10) {
         return (
             <p>
@@ -33,6 +33,11 @@ const Content = ({ countries }) => {
                         key={country.alpha3Code}
                     >
                         {country.name}
+                        <button 
+                            onClick={() => setCountries([country])}
+                        >
+                            show
+                        </button>
                     </li>
                 )}
             </ul>
@@ -101,6 +106,7 @@ function App() {
           />
           <Content
               countries={countries}
+              setCountries={setCountries}
           />
       </div>
     );
