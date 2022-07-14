@@ -36,9 +36,35 @@ const App = () => {
             .create(newPerson)
             .then(returnedPerson => {
                 setAllPersons(allPersons.concat(returnedPerson));
+                setNewName('');
+                setNewNumber('');
             });
-        } else {
-            alert(`${newName} is already added to the phonebook`);
+            
+        } else if (window.confirm(`${person[0].name} is already added to the phonebook, replace the old number with a new one ?`)) {
+            const newPerson = person[0];
+            const updatedPerson = {
+                ...newPerson,
+                number: newNumber
+            }
+            personService
+                .update(updatedPerson.id, updatedPerson)
+                .then(returnedPerson => {
+                    alert(`${returnedPerson.name} successfully updated`);
+                    setAllPersons(allPersons.map(personItem => {
+                        if(personItem.id !== newPerson.id ){
+                            return personItem
+                        } else {
+                            return returnedPerson
+                        }
+                    }))
+                    setNewName('');
+                    setNewNumber('');
+                    personService
+                        .getAll()
+                        .then(initialPersons => {
+                            setAllPersons(initialPersons)
+                        });
+                });
         }
     }
 
