@@ -3,6 +3,7 @@ import Content from './components/Content';
 import Filter from './components/Filter';
 import Person from './components/Person';
 import personService from './services/persons';
+import Notification from './components/Notification';
 
 const App = () => {
     const [ allPersons, setAllPersons ] = useState([]);
@@ -11,6 +12,7 @@ const App = () => {
     const [ newNumber, setNewNumber ] = useState('');
     const [ newFilter, setNewFilter ] = useState('');
     const [ filter, setFilter] = useState(false);
+    const [message, setMessage] = useState(null);
 
     useEffect(() => {        
         personService
@@ -38,6 +40,15 @@ const App = () => {
                 setAllPersons(allPersons.concat(returnedPerson));
                 setNewName('');
                 setNewNumber('');
+                setMessage(`Added ${newName}`);
+                    setTimeout(() => {
+                        setMessage(null);
+                        personService
+                            .getAll()
+                            .then(initialPersons => {
+                                setAllPersons(initialPersons)
+                            });
+                    }, 5000);
             });
             
         } else if (window.confirm(`${person[0].name} is already added to the phonebook, replace the old number with a new one ?`)) {
@@ -48,22 +59,25 @@ const App = () => {
             }
             personService
                 .update(updatedPerson.id, updatedPerson)
-                .then(returnedPerson => {
-                    alert(`${returnedPerson.name} successfully updated`);
+                .then(returnedPerson => {                    
                     setAllPersons(allPersons.map(personItem => {
                         if(personItem.id !== newPerson.id ){
                             return personItem
                         } else {
                             return returnedPerson
                         }
-                    }))
+                    }));
                     setNewName('');
                     setNewNumber('');
-                    personService
-                        .getAll()
-                        .then(initialPersons => {
-                            setAllPersons(initialPersons)
-                        });
+                    setMessage(`Updated ${newName}`);
+                        setTimeout(() => {
+                            setMessage(null);
+                            personService
+                                .getAll()
+                                .then(initialPersons => {
+                                setAllPersons(initialPersons)
+                            });
+                        }, 5000);
                 });
         }
     }
@@ -125,6 +139,9 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification
+                message={message}
+            />
             <Filter
                 newFilter={newFilter}
                 handleChangeFilter={handleChangeFilter}
