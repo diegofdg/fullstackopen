@@ -78,7 +78,14 @@ const App = () => {
                                 setAllPersons(initialPersons)
                             });
                         }, 5000);
-                });
+                })
+                .catch(error => {
+                    console.log(error);
+                    setMessage(`[ERROR] ${person[0].name} ${error.response.statusText}`)
+                    setTimeout(() => {
+                        setMessage(null);
+                    }, 5000);                  
+                })
         }
     }
 
@@ -88,17 +95,25 @@ const App = () => {
         if (window.confirm(`Delete ${personName} ?`)) {
             personService
                 .remove(id)
+                .then(                    
+                    setMessage(`${person[0].name} was successfully deleted`)
+                )
                 .then(
-                    personService
-                        .getAll()
-                        .then(initialPersons => {
-                            setAllPersons(initialPersons);
-                        })
+                    setTimeout(() => {
+                        setMessage(null);
+                        personService
+                            .getAll()
+                            .then(initialPersons => {
+                                setAllPersons(initialPersons);
+                            })
+                    }, 5000)
                 )
                 .catch(error => {
                     console.log(error);
-                    alert(`the person '${personName}' was already deleted from server`);
-                    setAllPersons(allPersons.filter(p => p.id !== id));
+                    setMessage(`[ERROR] ${person[0].name} ${error.response.statusText}`)
+                    setTimeout(() => {
+                        setMessage(null);
+                    }, 5000);                  
                 });
         }
     }
