@@ -29,6 +29,17 @@ app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>');
 });
 
+app.get('/info', (request, response) => {
+    response.send(
+            `<div>
+        <p>Phonebook has info for ${persons.length} people</p>
+    </div>
+    <div>
+        <p>${new Date()}</p>
+    </div>`
+    );
+});
+
 app.get('/api/persons', (request, response) => {
     response.json(persons);
 });
