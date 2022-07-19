@@ -2,6 +2,10 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 
+require('dotenv').config();
+
+const Person = require('./models/Person');
+
 const app = express();
 
 app.use(express.static('build'));
@@ -29,46 +33,29 @@ app.use(morgan(function (tokens, req, res) {
 
 app.use(express.json());
 
-let persons = [  
-    {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-      },
-      {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-      },
-      {
-        "name": "Dan Abramov",
-        "number": "12-43-234345",
-        "id": 3
-      },
-      {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-      }
-];
-
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>');
 });
 
-app.get('/info', (request, response) => {
+app.get('/info', async (request, response) => {
+    const persons = await Person.find({});
+        
     response.send(
-            `<div>
-        <p>Phonebook has info for ${persons.length} people</p>
-    </div>
-    <div>
-        <p>${new Date()}</p>
-    </div>`
+        `<div>
+            <p>Phonebook has info for ${persons.length} people</p>
+        </div>
+        <div>
+            <p>${new Date()}</p>
+        </div>`
     );
 });
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons);
+    Person
+        .find({})
+        .then(person => {
+            response.json(person);
+        })
 });
 
 app.get('/api/persons/:id', (request, response) => {
