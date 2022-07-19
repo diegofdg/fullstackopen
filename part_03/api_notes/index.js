@@ -13,6 +13,16 @@ app.use(cors());
 
 app.use(express.json());
 
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message);  
+    if (error.name === 'CastError') {
+        return response.status(400).send({
+            error: 'malformatted id'
+        })
+    }  
+    next(error);
+};
+
 const requestLogger = (request, response, next) => {
     console.log('Method:', request.method);
     console.log('Path:  ', request.path);
@@ -27,7 +37,7 @@ app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>');
 });
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/notes/:id', (request, response, next) => {
     Note
         .findById(request.params.id)
         .then(note => {
@@ -40,10 +50,7 @@ app.get('/api/notes/:id', (request, response) => {
             }
         })
         .catch(error => {
-            console.log(error)
-            response.status(400).send({
-                error: 'malformatted id'
-            });
+            next(error);
         });
 });
   
@@ -54,13 +61,6 @@ app.get('/api/notes', (request, response) => {
             response.json(notes);
         });
 });
-
-const generateId = () => {
-    const maxId = notes.length > 0
-      ? Math.max(...notes.map(n => n.id))
-      : 0
-    return maxId + 1;
-};
 
 app.post('/api/notes', (request, response) => {
     const body = request.body;
@@ -99,6 +99,8 @@ const unknownEndpoint = (request, response) => {
 };
 
 app.use(unknownEndpoint);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 
