@@ -78,35 +78,27 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end();
 });
 
-const generateId = () => {
-    const min = 1000000;
-    const max = 9999999;
-    const id = Math.floor(Math.random() * (max - min + 1) + min);
-    return id;
-}
-
 app.post('/api/persons', (request, response) => {
-    const body = request.body;      
-    if (!body.name || !body.number) {
-        return response.status(400).json({
-            error: 'name or number missing'
+    const body = request.body;
+    if (body.name === undefined || body.number === undefined) {
+        return response.status(400).json({ 
+            error: 'name or number missing' 
         });
     };
-
-    const person = persons.find(p => p.name === body.name);
-    if (person) {
-        response.status(404).send({
-            error: 'name must be unique'
-        });
-    } else {
-        const newPerson = {
+    const person = new Person(
+        {
             name: body.name,
-            number: body.number,
-            id: generateId(),
-        };
-        persons = persons.concat(newPerson);
-        response.json(newPerson);
-    }
+            number: body.number
+        }
+    );
+    person
+        .save()
+        .then(savedPerson => {
+            response.json(savedPerson);
+        })
+        .catch(error => {
+            response.json(error);
+        });    
 });
 
 const PORT = process.env.PORT || 3001;
