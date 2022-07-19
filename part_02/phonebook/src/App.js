@@ -49,6 +49,13 @@ const App = () => {
                                 setAllPersons(initialPersons)
                             });
                     }, 5000);
+            })
+            .catch(error => {
+                console.log(error);                
+                setMessage(`[ERROR] ${error}`);
+                setTimeout(() => {
+                    setMessage(null);
+                }, 5000);
             });
             
         } else if (window.confirm(`${person[0].name} is already added to the phonebook, replace the old number with a new one ?`)) {
@@ -81,7 +88,7 @@ const App = () => {
                 })
                 .catch(error => {
                     console.log(error);
-                    setMessage(`[ERROR] ${person[0].name} ${error.response.statusText}`)
+                    setMessage(`[ERROR] ${person[0].name} ${error.response.statusText}`);
                     setTimeout(() => {
                         setMessage(null);
                     }, 5000);                  
