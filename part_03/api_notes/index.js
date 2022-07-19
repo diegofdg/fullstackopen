@@ -1,5 +1,35 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
+
+require('dotenv').config();
+
+const url = process.env.MONGODB_URI;
+
+mongoose.connect(url, 
+    {
+        useNewUrlParser: true, 
+        useUnifiedTopology: true
+    }
+);
+
+const noteSchema = new mongoose.Schema(
+    {
+        content: String,
+        date: Date,
+        important: Boolean,
+    }
+);
+
+noteSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+      returnedObject.id = returnedObject._id.toString()
+      delete returnedObject._id
+      delete returnedObject.__v
+    }
+});
+
+const Note = mongoose.model('Note', noteSchema);
 
 const app = express();
 
@@ -17,27 +47,6 @@ const requestLogger = (request, response, next) => {
     next();
 };
 
-let notes = [  
-    {    
-        id: 1,
-        content: "HTML is easy",
-        date: "2019-05-30T17:30:31.098Z",
-        important: true  
-    },
-    {    
-        id: 2,
-        content: "Browser can execute only Javascript",
-        date: "2019-05-30T18:39:34.091Z",
-        important: false  
-    },
-    {
-        id: 3,
-        content: "GET and POST are the most important methods of HTTP protocol",
-        date: "2019-05-30T19:20:14.298Z",
-        important: true  
-    }
-];
-
 app.use(requestLogger);
 
 app.get('/', (request, response) => {
@@ -46,7 +55,7 @@ app.get('/', (request, response) => {
 
 app.get('/api/notes/:id', (request, response) => {
     const id = Number(request.params.id);
-    const note = notes.find(note => {
+    const note = Note.find(note => {
         return note.id === id;
     });
     if (note) {
@@ -57,7 +66,11 @@ app.get('/api/notes/:id', (request, response) => {
 });
   
 app.get('/api/notes', (request, response) => {
-    response.json(notes);
+    Note
+        .find({})
+        .then(notes => {
+            response.json(notes);
+        });
 });
 
 const generateId = () => {
