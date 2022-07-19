@@ -1,1 +1,0 @@
-{"version":3,"file":"static/css/main.26b6413e.css","mappings":"AAAA,EACI,QACJ,CAEA,GACI,SACJ,CAEA,aACI,UACJ","sources":["index.css"],"sourcesContent":["p {\r\n    margin: 0px;  \r\n}\r\n\r\nul {\r\n    padding: 0px;\r\n}\r\n\r\nbutton, input {\r\n    margin: 5px;\r\n}"],"names":[],"sourceRoot":""}
