@@ -33,6 +33,16 @@ app.use(morgan(function (tokens, req, res) {
 
 app.use(express.json());
 
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message);  
+    if (error.name === 'CastError') {
+        return response.status(400).send({
+            error: 'malformatted id'
+        });
+    }  
+    next(error);
+}
+
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>');
 });
@@ -70,7 +80,7 @@ app.get('/api/persons/:id', (request, response) => {
     }
 });
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     Person
         .findByIdAndRemove(request.params.id)
         .then(result => {
@@ -103,6 +113,8 @@ app.post('/api/persons', (request, response) => {
             response.json(error);
         });    
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
