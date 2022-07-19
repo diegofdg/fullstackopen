@@ -28,15 +28,11 @@ app.get('/', (request, response) => {
 });
 
 app.get('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id);
-    const note = Note.find(note => {
-        return note.id === id;
-    });
-    if (note) {
-        response.json(note);
-    } else {
-        response.status(404).end();
-    }
+    Note
+        .findById(request.params.id)
+        .then(note => {
+            response.json(note);
+        });
 });
   
 app.get('/api/notes', (request, response) => {
@@ -57,22 +53,25 @@ const generateId = () => {
 app.post('/api/notes', (request, response) => {
     const body = request.body;
 
-    if (!body.content) {
+    if (body.content === undefined) {
         return response.status(400).json({ 
             error: 'content missing' 
         });
     };
 
-    const note = {
-        content: body.content,
-        important: body.important || false,
-        date: new Date(),
-        id: generateId(),
-    };
+    const note = new Note(
+        {
+            content: body.content,
+            important: body.important || false,
+            date: new Date()
+        }
+    );
 
-    notes = notes.concat(note);
-
-    response.json(note);
+    note
+        .save()
+        .then(savedNote => {
+            response.json(savedNote);
+        });
 });
 
 app.delete('/api/notes/:id', (request, response) => {
