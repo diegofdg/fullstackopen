@@ -127,3 +127,26 @@ describe('Author who has the largest amount of blogs', () => {
         });
     });
 });
+
+describe('Author whose blog posts have the largest amount of likes', () => {
+    test('of empty list is {}', () => {
+        const result = listHelper.mostLikes([]);
+        expect(result).toEqual({});
+    });
+
+    test('when list has only one blog equals to the author of that blog', () => {        
+        const mostBlogs = listHelper.mostLikes(oneBlog);
+        expect(mostBlogs).toEqual({
+            author: "Edsger W. Dijkstra",
+            likes: 5
+        });
+    });
+
+    test('of a bigger list is calculated right', () => {
+        const mostBlogs = listHelper.mostLikes(blogs);
+        expect(mostBlogs).toEqual({
+            author: "Edsger W. Dijkstra",
+            likes: 17
+        });
+    });
+});
