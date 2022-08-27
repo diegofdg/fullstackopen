@@ -1,0 +1,252 @@
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const supertest = require('supertest');
+const helper = require('./test_helper');
+const app = require('../app');
+
+const api = supertest(app);
+
+const Note = require('../models/note');
+const User = require('../models/user');
+
+let headers;
+let idUser1;
+
+describe('users test', () => {
+	jest.setTimeout(10000);
+
+	beforeEach(async () => {
+		await User.deleteMany({});
+		const newUser = {
+			username: 'root',
+			name: 'Superuser',
+			password: 'root'
+		};
+		await api
+			.post('/api/users')
+			.send(newUser);
+	});
+
+	test('register an user', async () => {
+		const usersAtStart = await helper.usersInDb();
+		const newUser = {
+			username: 'test',
+			name: 'Test User',
+			password: 'test'
+		};
+		const result = await api
+			.post('/api/users')
+			.send(newUser);
+		idUser1 = result.body.id;
+		expect(result.statusCode).toEqual(201);
+
+		const usersAtEnd = await helper.usersInDb();
+		expect(usersAtEnd).toHaveLength(usersAtStart.length + 1);
+
+		const usernames = usersAtEnd.map(u => u.username);
+		expect(usernames).toContain(newUser.username);
+	});
+
+	test('login root user', async () => {
+		const newUser = {
+			username: 'root',
+			password: 'root'
+		};
+		const result = await api
+			.post('/api/login')
+			.send(newUser);
+		headers = {
+			'Authorization': `bearer ${result.body.token}`
+		};
+		expect(result.statusCode).toEqual(200);
+		expect(result.body).toHaveProperty('token');
+	});
+
+	test('error when registering same user', async () => {
+		const usersAtStart = await helper.usersInDb();
+		const newUser = {
+			username: 'root',
+			name: 'Superuser',
+			password: 'root'
+		};
+		const result = await api
+			.post('/api/users')
+			.send(newUser);
+		expect(result.statusCode).toEqual(400);
+		expect(result.body).toHaveProperty('error');
+
+		expect(result.body.error).toContain('`username` to be unique');
+
+		const usersAtEnd = await helper.usersInDb();
+		expect(usersAtEnd).toHaveLength(usersAtStart.length);
+	});
+});
+
+describe('get notes tests', () => {
+	jest.setTimeout(10000);
+
+	beforeEach(async () => {
+		await User.deleteMany({});
+		const newUser = {
+			username: 'root',
+			name: 'Superuser',
+			password: 'root'
+		};
+		await api
+			.post('/api/users')
+			.send(newUser);
+
+		await Note.deleteMany({});
+		const noteObjects = helper.initialNotes.map(note => new Note(note));
+		const promiseArray = noteObjects.map(note => note.save());
+		await Promise.all(promiseArray);
+	});
+
+	test('notes are returned as json', async () => {
+		await api
+			.get('/api/notes')
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+	});
+
+	test('there are two notes', async () => {
+		const response = await api
+			.get('/api/notes');
+		expect(response.body).toHaveLength(helper.initialNotes.length);
+	});
+
+	test('the first note is about HTML is easy', async () => {
+		const response = await api
+			.get('/api/notes');
+		const contents = response.body.map(note => note.title);
+		expect(response.body[0].content).toBe('HTML is easy');
+	});
+
+	test('the unique identifier property of the note is by default _id', async () => {
+		const note = await Note.find({});
+		expect(note[0]._id).toBeDefined();
+	});
+
+	test('all notes are returned', async () => {
+		const response = await api.get('/api/notes');
+		expect(response.body).toHaveLength(helper.initialNotes.length);
+	});
+
+	test('a specific note is within the returned notes', async () => {
+		const response = await api.get('/api/notes');
+		const contents = response.body.map(r => r.content);
+		expect(contents).toContain('Browser can execute only Javascript');
+	});
+});
+
+describe('viewing a specific note', () => {
+	test('a specific note can be viewed', async () => {
+		const notesAtStart = await helper.notesInDb();
+		const noteToView = notesAtStart[0];
+
+		const resultNote = await api
+			.get(`/api/notes/${noteToView.id}`)
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+
+		const processedNoteToView = JSON.parse(JSON.stringify(noteToView));
+		expect(resultNote.body).toEqual(processedNoteToView);
+	});
+
+	test('fails with statuscode 404 if note does not exist', async () => {
+		const validNonexistingId = await helper.nonExistingId();
+
+		await api
+			.get(`/api/notes/${validNonexistingId}`)
+			.expect(404);
+	});
+
+	test('fails with statuscode 400 id is invalid', async () => {
+		const invalidId = '5a3d5da59070081a82a3445';
+		await api
+			.get(`/api/notes/${invalidId}`)
+			.expect(400);
+	});
+});
+
+
+describe('addition of a new note', () => {
+	beforeEach(async () => {
+		await User.deleteMany({});
+		const newUser = {
+			username: 'root',
+			name: 'Superuser',
+			password: 'root'
+		};
+
+		const createUser = await api
+			.post('/api/users')
+			.send(newUser);
+		idUser1 = createUser.body.id;
+
+		const loginUser = await api
+			.post('/api/login')
+			.send(newUser);
+		headers = {
+			'Authorization': `bearer ${loginUser.body.token}`
+		};
+
+		await Note.deleteMany({});
+		const noteObjects = helper.initialNotes.map(note => new Note(note));
+		const promiseArray = noteObjects.map(note => note.save());
+		await Promise.all(promiseArray);
+	});
+
+	test('a valid note can be added', async () => {
+		const newNote = {
+			content: 'async/await simplifies making async calls',
+			important: true,
+			user: idUser1
+		};
+		await api
+			.post('/api/notes')
+			.set(headers)
+			.send(newNote)
+			.expect(201)
+			.expect('Content-Type', /application\/json/);
+		const notesAtEnd = await helper.notesInDb();
+		expect(notesAtEnd).toHaveLength(helper.initialNotes.length + 1);
+		const contents = notesAtEnd.map(n => n.content);
+		expect(contents).toContain(
+			'async/await simplifies making async calls'
+		);
+	});
+
+	test('note without content is not added', async () => {
+		const newNote = {
+			important: true
+		};
+		await api
+			.post('/api/notes')
+			.set(headers)
+			.send(newNote)
+			.expect(400);
+		const notesAtEnd = await helper.notesInDb();
+		expect(notesAtEnd).toHaveLength(helper.initialNotes.length);
+	});
+});
+
+describe('deletion of a note', () => {
+	test('a note can be deleted', async () => {
+		const notesAtStart = await helper.notesInDb();
+		const noteToDelete = notesAtStart[0];
+		await api
+			.delete(`/api/notes/${noteToDelete.id}`)
+			.expect(204);
+		const notesAtEnd = await helper.notesInDb();
+		expect(notesAtEnd).toHaveLength(
+			helper.initialNotes.length - 1
+		);
+		const contents = notesAtEnd.map(r => r.content);
+		expect(contents).not.toContain(noteToDelete.content);
+	});
+});
+
+afterAll(() => {
+	mongoose.connection.close();
+});
