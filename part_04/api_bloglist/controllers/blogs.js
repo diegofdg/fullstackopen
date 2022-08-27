@@ -1,12 +1,13 @@
 const blogsRouter = require('express').Router();
 const Blog = require('../models/Blog');
+const User = require('../models/User');
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({});
-  response.json(blogs);    
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
+    response.json(blogs.map(blog => blog.toJSON()));
 });
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', async (request, response, next) => {
   const body = request.body;
 
   if (!body.likes) {
@@ -18,20 +19,30 @@ blogsRouter.post('/', async (request, response) => {
       error: 'title or url missing'
     });
   }
+
+  const users = await User.find({});
+    const randomUser = users[Math.floor(Math.random() * users.length)];
   
   const blog = new Blog({
       title: body.title,
       author: body.author,
       url: body.url,
-      likes: body.likes
+      likes: body.likes,
+      user: randomUser._id
   });
 
   try {
     const result = await blog.save();
+    randomUser.blogs = randomUser.blogs.concat(blog._id);
+        await randomUser.save();
     response.status(201).json(result);
   } catch (error) {
-    next(error);
-  }    
+      if (error.code === 11000) {
+			  return response.status(400).json({ error: error.message });
+		} else {
+			  next(error);
+		}
+  }
 });
 
 blogsRouter.put('/:id', async (request, response, next) => {
