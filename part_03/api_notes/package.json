@@ -14,12 +14,14 @@
   "author": "Diego Di Giorgio",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "eslint": "^8.20.0",
     "express": "^4.18.1",
     "express-async-errors": "^3.1.1",
-    "mongoose": "^6.4.5"
+    "mongoose": "^6.4.5",
+    "mongoose-unique-validator": "^3.1.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
