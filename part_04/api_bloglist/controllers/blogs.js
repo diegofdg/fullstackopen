@@ -7,7 +7,18 @@ blogsRouter.get('/', async (request, response) => {
 });
 
 blogsRouter.post('/', (request, response) => {
-    const blog = new Blog(request.body);
+  const body = request.body;
+
+  if (!body.likes) {
+    body.likes = 0;
+  }
+  
+  const blog = new Blog({
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes
+  });
 
     blog
       .save()
