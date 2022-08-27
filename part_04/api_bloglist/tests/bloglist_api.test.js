@@ -86,6 +86,29 @@ test('if title and url are missing, respond with error 400 (bad request)', async
 	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 });
 
+describe('update a blog', () => {	
+	test('Blog update successful ', async () => {
+		const allBlogs = await helper.blogsInDb();
+		const blogToUpdate = allBlogs.find(blog => blog.title === 'React patterns');
+
+		const updatedBlog = {
+			...blogToUpdate,
+			likes: blogToUpdate.likes + 1
+		};
+
+		await api
+			.put(`/api/blogs/${blogToUpdate.id}`)
+			.send(updatedBlog)
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+
+		const blogsAtEnd = await helper.blogsInDb();
+		expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+		const foundBlog = blogsAtEnd.find(blog => blog.title === 'React patterns');
+		expect(foundBlog.likes).toBe(8);
+	});
+});
+
 describe('Deletion of a blog', () => {
 	test('succeeds with status code 204', async () => {
 		const allBlogs = await helper.blogsInDb();
