@@ -12,6 +12,12 @@ blogsRouter.post('/', (request, response) => {
   if (!body.likes) {
     body.likes = 0;
   }
+
+  if (!body.title || !body.url){
+    return response.status(400).json({
+      error: 'content missing'
+    });
+  }
   
   const blog = new Blog({
       title: body.title,

@@ -70,6 +70,22 @@ test('if likes property is missing, it will default to 0 ', async () => {
 	expect(addedBlog.likes).toBe(0);
 });
 
+test('if title and url are missing, respond with error 400 (bad request)', async () => {
+	const newBlog = {
+		author: 'Edsger W. Dijkstra',
+		likes: 12
+	};
+
+	await api
+		.post('/api/blogs')
+		.send(newBlog)		
+		.expect(400);
+
+	const blogsAtEnd = await helper.blogsInDb();
+
+	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+});
+
 afterAll(() => {
 	mongoose.connection.close();
 });
