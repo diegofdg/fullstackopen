@@ -86,6 +86,26 @@ test('if title and url are missing, respond with error 400 (bad request)', async
 	expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 });
 
+describe('Deletion of a blog', () => {
+	test('succeeds with status code 204', async () => {
+		const allBlogs = await helper.blogsInDb();
+		const blogToDelete = allBlogs.find(blog => blog.title === 'React patterns');
+
+		await api
+			.delete(`/api/blogs/${blogToDelete.id}`)
+			.expect(204);
+
+		const blogsAtEnd = await helper.blogsInDb();
+
+		expect(blogsAtEnd).toHaveLength(
+			helper.initialBlogs.length - 1
+		);
+
+		const contents = blogsAtEnd.map(r => r.title);
+		expect(contents).not.toContain(blogToDelete.title);
+	});
+});
+
 afterAll(() => {
 	mongoose.connection.close();
 });
