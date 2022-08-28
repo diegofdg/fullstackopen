@@ -19,7 +19,7 @@ usersRouter.post('/', async (request, response, next) => {
 	
 		const savedUser = await user.save();
 	
-		response.json(savedUser);		
+		response.status(201).json({savedUser});
 	} catch (error) {
 		if (error.name === 'ValidationError') {
 			return response.status(400).json({ error: error.message });		
