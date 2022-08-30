@@ -8,9 +8,10 @@ import BlogForm from './components/BlogForm';
 
 const App = () => {
     const [blogs, setBlogs] = useState([]);
+    const [successMessage, setSuccessMessage] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
-    const [username, setUsername] = useState('root');
-    const [password, setPassword] = useState('root');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [user, setUser] = useState(null);
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
@@ -48,7 +49,7 @@ const App = () => {
             setUsername('');
             setPassword('');
         } catch (error) {
-            setErrorMessage('wrong credentials');
+            setErrorMessage('wrong username or password');
             setTimeout(() => {
                 setErrorMessage(null);
             }, 5000);
@@ -74,24 +75,29 @@ const App = () => {
     }
 
     const addBlog = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         const BlogToAdd = {
-          title: title,
-          author: author,
-          url: url
+            title,
+            author,
+            url
         }
     
         try {
             await blogService.create(BlogToAdd);
             setTitle('');
             setAuthor('');
-            setUrl('');            
-            getAllBlogs();
+            setUrl('');
+            setSuccessMessage(`a new blog ${BlogToAdd.title} by ${BlogToAdd.author} added`);           
             setErrorMessage(null);
+            getAllBlogs();
+            setTimeout(() => {
+                setSuccessMessage(null);
+            }, 5000);
         } catch(error) {
-            setErrorMessage(
-                `Cannot add blog ${BlogToAdd.title}`
-            );
+            setErrorMessage(`cannot add blog ${BlogToAdd.title} by ${BlogToAdd.author}`);
+            setTimeout(() => {                
+                setErrorMessage(null);
+            }, 5000);
         }
     }
 
@@ -101,6 +107,7 @@ const App = () => {
                 <h2>Log in to application</h2>
                 <Notification
                     errorMessage={errorMessage}
+                    successMessage={successMessage}
                 />
                 <form 
                     onSubmit={handleLogin}
@@ -133,6 +140,10 @@ const App = () => {
     return (
         <div>
             <h2>Add new blog</h2>
+            <Notification
+                errorMessage={errorMessage}
+                successMessage={successMessage}
+            />
             <p>
                 {user.name} logged-in
                     <button
@@ -150,9 +161,14 @@ const App = () => {
                 url={url}
                 handleUrlChange={handleUrlChange}
             />
-            {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} />
-            )}
+            <ul>
+                {blogs.map(blog =>
+                    <Blog
+                        key={blog.id}
+                        blog={blog}
+                    />
+                )}
+            </ul>
         </div>
     )
 }
