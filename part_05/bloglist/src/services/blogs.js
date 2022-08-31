@@ -3,11 +3,13 @@ const baseUrl = '/api/blogs';
 
 // eslint-disable-next-line
 let token = null;
+let config;
+
 const setToken = newToken => {
     token = `bearer ${newToken}`;
 }
 
-const config = {
+config = {
     headers: { Authorization: token }
 }
 
@@ -23,7 +25,7 @@ const create = async newObject => {
 
 const update = async objectToUpdate => {    
   const response = await axios.put(`${baseUrl}/${objectToUpdate.id}`, objectToUpdate, config)
-  return response.data
+  return response.data;
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export

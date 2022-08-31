@@ -32,6 +32,7 @@ const App = () => {
 
     const getAllBlogs = async () => {
         const blogs = await blogService.getAll();
+        blogs.sort((a, b) => (a.likes > b.likes) ? -1 : 1)
         setBlogs(blogs);
     }
     
@@ -81,7 +82,8 @@ const App = () => {
         try {
             const updatedBlog = await blogService.update(BlogToUpdate);
             setBlogs(blogs.map(blog => blog.id !== BlogToUpdate.id ? blog : updatedBlog));
-        } catch(exception) {
+            getAllBlogs();
+        } catch(error) {
             setErrorMessage(`Cannot update blog ${BlogToUpdate.title}`);
             setTimeout(() => {
                 setErrorMessage(null);
