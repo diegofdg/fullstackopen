@@ -75,7 +75,19 @@ const App = () => {
                 setErrorMessage(null);
             }, 5000);
         }
-    } 
+    }
+
+    const updateBlog = async (BlogToUpdate) => {        
+        try {
+            const updatedBlog = await blogService.update(BlogToUpdate);
+            setBlogs(blogs.map(blog => blog.id !== BlogToUpdate.id ? blog : updatedBlog));
+        } catch(exception) {
+            setErrorMessage(`Cannot update blog ${BlogToUpdate.title}`);
+            setTimeout(() => {
+                setErrorMessage(null);
+            }, 5000);
+        }
+    }
     
     const loginForm = () => (
         <Togglable
@@ -128,6 +140,7 @@ const App = () => {
                     <Blog
                         key={blog.id}
                         blog={blog}
+                        updateBlog={updateBlog}
                     />
                 )}
             </ul>

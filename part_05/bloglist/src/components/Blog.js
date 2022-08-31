@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 const Blog = ( props ) => {
-
     const blog = props.blog;
+    const [blogObject, setBlogObject] = useState(blog);
     const [visible, setVisible] = useState(false);
     const showWhenVisible = { display: visible ? '' : 'none' };
 
@@ -11,6 +11,15 @@ const Blog = ( props ) => {
   }
 
     const buttonLabel = visible ? 'hide' : 'view';
+
+    const increaseLikes = () => {
+        const updatedBlog = ({
+          ...blog,
+          likes: blog.likes + 1
+        })
+        props.updateBlog(updatedBlog);
+        setBlogObject(updatedBlog);
+    }
 
     const blogStyle = {
         paddingTop: 10,
@@ -38,8 +47,11 @@ const Blog = ( props ) => {
             >
                 <p>{blog.url}</p>
                 <p>
-                    likes {props.blog.likes}
-                    <button>like</button>
+                    likes {blogObject.likes}
+                    <button
+                        onClick={increaseLikes}
+                    >like
+                    </button>
                 </p>                
             </div>
         </div>
