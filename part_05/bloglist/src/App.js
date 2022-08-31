@@ -90,6 +90,25 @@ const App = () => {
             }, 5000);
         }
     }
+
+    const deleteBlog = async (BlogToDelete) => {
+        try {
+            if (window.confirm(`delete ${BlogToDelete.title} by ${BlogToDelete.author}?`)) {
+                blogService.remove(BlogToDelete.id);
+                setSuccessMessage(`blog ${BlogToDelete.title} was successfully deleted`);
+                setBlogs(blogs.filter(blog => blog.id !== BlogToDelete.id));
+                setErrorMessage(null);
+                setTimeout(() => {
+                    setSuccessMessage(null);
+                }, 5000);
+            }
+        } catch(error) {
+            setErrorMessage(`cannot delete blog ${BlogToDelete.title} by ${BlogToDelete.author}`);
+            setTimeout(() => {
+                setErrorMessage(null);
+            }, 5000);
+        }
+    }
     
     const loginForm = () => (
         <Togglable
@@ -143,6 +162,7 @@ const App = () => {
                         key={blog.id}
                         blog={blog}
                         updateBlog={updateBlog}
+                        deleteBlog={deleteBlog}
                     />
                 )}
             </ul>

@@ -21,6 +21,8 @@ const Blog = ( props ) => {
         setBlogObject(updatedBlog);
     }
 
+    const removeBlog = () => props.deleteBlog(blog);
+
     const blogStyle = {
         paddingTop: 10,
         paddingLeft: 2,
@@ -52,7 +54,11 @@ const Blog = ( props ) => {
                         onClick={increaseLikes}
                     >like
                     </button>
-                </p>                
+                </p>
+                <button
+                    onClick={removeBlog}
+                >remove
+                </button>           
             </div>
         </div>
     );
