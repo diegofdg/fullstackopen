@@ -10,7 +10,6 @@ import Togglable from './components/Togglable';
 
 const App = () => {
     const [notes, setNotes] = useState([]);
-    const [newNote, setNewNote] = useState('');
     const [showAll, setShowAll] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
     const [username, setUsername] = useState('');
@@ -34,23 +33,12 @@ const App = () => {
         }
     }, []);
 
-    const addNote = (e) => {
-        e.preventDefault();
-        const noteObject = {
-            content: newNote,
-            date: new Date().toISOString(),
-            important: Math.random() < 0.5
-        };
+    const addNote = (noteObject) => {
         noteService
             .create(noteObject)
             .then(returnedNote => {
                 setNotes(notes.concat(returnedNote));
-                setNewNote('');
             });
-    }
-
-    const handleNoteChange = (e) => {
-        setNewNote(e.target.value);
     }
 
     const notesToShow = showAll
@@ -113,11 +101,11 @@ const App = () => {
     );
 
     const noteForm = () => (
-        <Togglable buttonLabel="new note">
+        <Togglable 
+            buttonLabel="new note"
+        >
             <NoteForm
-                onSubmit={addNote}
-                value={newNote}
-                handleChange={handleNoteChange}
+                createNote={addNote}
             />
       </Togglable>
     );
