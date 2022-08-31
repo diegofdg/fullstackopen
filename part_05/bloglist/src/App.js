@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import Blog from './components/Blog';
-import blogService from './services/blogs';
-import loginService from './services/login';
 import Notification from './components/Notification';
 import BlogForm from './components/BlogForm';
+import LoginForm from './components/LoginForm';
+import Togglable from './components/Togglable';
+import blogService from './services/blogs';
+import loginService from './services/login';
 
 const App = () => {
+    const blogFormRef = useRef();
     const [blogs, setBlogs] = useState([]);
     const [successMessage, setSuccessMessage] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [user, setUser] = useState(null);
-    const [title, setTitle] = useState('');
-    const [author, setAuthor] = useState('');
-    const [url, setUrl] = useState('');
+    const [user, setUser] = useState(null);    
 
     useEffect(() => {
         getAllBlogs();
@@ -34,16 +34,12 @@ const App = () => {
         const blogs = await blogService.getAll();
         setBlogs(blogs);
     }
-
+    
     const handleLogin = async(e) => {
         e.preventDefault();
         try {
-            const user = await loginService.login({
-                username, password
-            });
-            window.localStorage.setItem(
-                'loggedBlogappUser', JSON.stringify(user)
-            );
+            const user = await loginService.login({ username, password });
+            window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
             blogService.setToken(user.token);
             setUser(user);
             setUsername('');
@@ -60,107 +56,73 @@ const App = () => {
         e.preventDefault();
         window.localStorage.removeItem('loggedBlogappUser');
         setUser(null);
-    }
+    }    
 
-    const handleTitleChange = (e) => {
-        setTitle(e.target.value);
-    }
-    
-    const handleAuthorChange = (e) => {
-        setAuthor(e.target.value);
-    }
-    
-    const handleUrlChange = (e) => {
-        setUrl(e.target.value);
-    }
-
-    const addBlog = async (e) => {
-        e.preventDefault();
-        const BlogToAdd = {
-            title,
-            author,
-            url
-        }
-    
+    const addBlog = async ( blogObject ) => {
+        blogFormRef.current.toggleVisibility();
+            
         try {
-            await blogService.create(BlogToAdd);
-            setTitle('');
-            setAuthor('');
-            setUrl('');
-            setSuccessMessage(`a new blog ${BlogToAdd.title} by ${BlogToAdd.author} added`);           
+            await blogService.create(blogObject);            
+            setSuccessMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`);
             setErrorMessage(null);
             getAllBlogs();
             setTimeout(() => {
                 setSuccessMessage(null);
             }, 5000);
         } catch(error) {
-            setErrorMessage(`cannot add blog ${BlogToAdd.title} by ${BlogToAdd.author}`);
+            setErrorMessage(`cannot add blog ${blogObject.title} by ${blogObject.author}`);
             setTimeout(() => {                
                 setErrorMessage(null);
             }, 5000);
         }
-    }
+    } 
+    
+    const loginForm = () => (
+        <Togglable
+            buttonLabel="log in"
+        >
+            <LoginForm                
+                handleLogin={handleLogin}
+                username={username}
+                setUsername={setUsername}
+                setPassword={setPassword}
+                password={password}
+            />
+        </Togglable>
+    );
 
-    if (user === null) {
-        return (
-            <div>
-                <h2>Log in to application</h2>
-                <Notification
-                    errorMessage={errorMessage}
-                    successMessage={successMessage}
-                />
-                <form 
-                    onSubmit={handleLogin}
-                >
-                    <div>username
-                        <input
-                            type="text"
-                            value={username}
-                            name="Username"
-                            onChange={({ target }) => setUsername(target.value)}
-                        />
-                    </div>
-                    <div>password
-                        <input
-                            type="password"
-                            value={password}
-                            name="Password"
-                            onChange={({ target }) => setPassword(target.value)}
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                    >login
-                    </button>
-                </form>
-            </div>
-        );
-    }                                         
+    const blogForm = () => (
+        <Togglable
+            buttonLabel="create new blog"
+            ref={blogFormRef}
+        >
+            <BlogForm
+                createBlog={addBlog}
+            />
+        </Togglable>
+    );
 
     return (
         <div>
-            <h2>Add new blog</h2>
+            <h1>Blogs</h1>
             <Notification
                 errorMessage={errorMessage}
                 successMessage={successMessage}
             />
-            <p>
-                {user.name} logged-in
-                    <button
-                        onClick={handleLogout}
-                        type="submit"
-                    >logout
-                    </button>            
-            </p>
-            <BlogForm
-                onSubmit={addBlog}
-                title={title}
-                handleTitleChange={handleTitleChange}
-                author={author}
-                handleAuthorChange={handleAuthorChange}
-                url={url}
-                handleUrlChange={handleUrlChange}
-            />
+            {user === null
+                ? loginForm()                
+                : <div>
+                    <p>
+                        {user.name} logged-in
+                        <button
+                            onClick={handleLogout}
+                            type="submit"
+                        >logout
+                        </button>
+                    </p>
+                    {blogForm()}
+                </div>
+            }
             <ul>
                 {blogs.map(blog =>
                     <Blog
@@ -170,7 +132,7 @@ const App = () => {
                 )}
             </ul>
         </div>
-    )
+    );
 }
 
 export default App;
