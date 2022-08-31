@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import noteService from './services/notes';
 import loginService from './services/login';
 import Note from './components/Note';
@@ -15,6 +15,7 @@ const App = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [user, setUser] = useState(null);
+    const noteFormRef = useRef();
 
     useEffect(() => {
         noteService
@@ -34,6 +35,7 @@ const App = () => {
     }, []);
 
     const addNote = (noteObject) => {
+        noteFormRef.current.toggleVisibility();
         noteService
             .create(noteObject)
             .then(returnedNote => {
@@ -103,6 +105,7 @@ const App = () => {
     const noteForm = () => (
         <Togglable 
             buttonLabel="new note"
+            ref={noteFormRef}
         >
             <NoteForm
                 createNote={addNote}
