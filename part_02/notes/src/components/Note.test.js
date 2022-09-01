@@ -1,6 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import { render } from '@testing-library/react';
+import { prettyDOM } from '@testing-library/dom';
 import Note from './Note';
 
 test('renders content', () => {
@@ -13,20 +14,11 @@ test('renders content', () => {
 		<Note note={note} />
 	);
 
-	expect(component.container).toHaveTextContent(
-		'Component testing is done with react-testing-library'
-	);
-});
+	const li = component.container.querySelector('li');
 
-test('renders content', () => {
-	const note = {
-		content: 'Component testing is done with react-testing-library',
-		important: true
-	};
+	console.log(prettyDOM(li));
 
-	const component = render(
-		<Note note={note} />
-	);
+	component.debug();
 
 	// method 1
 	expect(component.container).toHaveTextContent(
