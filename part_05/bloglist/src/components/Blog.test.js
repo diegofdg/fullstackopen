@@ -35,4 +35,16 @@ describe('Blog component tests', () => {
 			'7'
 		);
 	});
+
+	test('calls the update handler twice when clicking "like" twice', () => {
+		const component = render(
+			<Blog blog={blog} updateBlog={mockUpdateBlog} deleteBlog={mockDeleteBlog} />
+		);
+		const viewButton = component.getByText('view');
+		fireEvent.click(viewButton);
+		const likeButton = component.getByText('like');
+		fireEvent.click(likeButton);
+		fireEvent.click(likeButton);
+		expect(mockUpdateBlog.mock.calls).toHaveLength(2);
+	});
 });
