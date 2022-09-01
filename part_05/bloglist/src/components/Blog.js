@@ -35,6 +35,7 @@ const Blog = ( props ) => {
 	return (
 		<div
 			style={blogStyle}
+			className='blog'
 		>
 			<div>
 				<p>
