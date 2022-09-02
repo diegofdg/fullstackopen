@@ -59,6 +59,7 @@ const Blog = ( props ) => {
 					</button>
 				</p>
 				<button
+					id='remove-button'
 					onClick={removeBlog}
 				>remove
 				</button>

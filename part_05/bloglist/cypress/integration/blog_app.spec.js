@@ -10,7 +10,7 @@ describe('Blog app', function() {
 		cy.visit('http://localhost:3000');
 	});
 
-	it('Login form is shown', function() {
+	/* it('Login form is shown', function() {
 		cy.contains('username');
 		cy.contains('password');
 		cy.contains('log in');
@@ -37,7 +37,7 @@ describe('Blog app', function() {
 				.and('have.css', 'border-bottom-style', 'solid');
 			cy.get('html').should('not.contain', 'Superuser Blog logged-in');
 		});
-	});
+	}); */
 
 	describe('when logged in', function() {
 		beforeEach(function() {
@@ -59,6 +59,15 @@ describe('Blog app', function() {
 			cy.get('#like-button').click();
 			cy.contains('1');
 		});
-	});
 
+		it('user who created a blog can delete it', function() {
+			cy.contains('create new blog').click();
+			cy.createBlog({ title: 'React patterns', author: 'Michael Chan', url: 'https://reactpatterns.com/' });
+			cy.contains('React patterns - Michael Chan');
+			cy.contains('view').click();
+			cy.deleteBlog();
+			//cy.get('#remove-button').click();
+			cy.get('html').should('not.contain', 'React patterns - Michael Chan');
+		});
+	});
 });

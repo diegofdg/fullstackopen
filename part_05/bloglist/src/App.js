@@ -94,7 +94,7 @@ const App = () => {
 	const deleteBlog = async (BlogToDelete) => {
 		try {
 			if (window.confirm(`delete ${BlogToDelete.title} by ${BlogToDelete.author}?`)) {
-				blogService.remove(BlogToDelete.id);
+				await blogService.remove(BlogToDelete.id);
 				setSuccessMessage(`blog ${BlogToDelete.title} was successfully deleted`);
 				setBlogs(blogs.filter(blog => blog.id !== BlogToDelete.id));
 				setErrorMessage(null);
