@@ -49,5 +49,16 @@ describe('Blog app', function() {
 			cy.createBlog({ title: 'React patterns', author: 'Michael Chan', url: 'https://reactpatterns.com/' });
 			cy.contains('React patterns - Michael Chan');
 		});
+
+		it('user can like a blog', function() {
+			cy.contains('create new blog').click();
+			cy.createBlog({ title: 'React patterns', author: 'Michael Chan', url: 'https://reactpatterns.com/' });
+			cy.contains('React patterns - Michael Chan');
+			cy.contains('view').click();
+			cy.contains('0');
+			cy.get('#like-button').click();
+			cy.contains('1');
+		});
 	});
+
 });

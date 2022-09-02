@@ -53,6 +53,7 @@ const Blog = ( props ) => {
 				<p>
                     likes {blogObject.likes}
 					<button
+						id='like-button'
 						onClick={increaseLikes}
 					>like
 					</button>
