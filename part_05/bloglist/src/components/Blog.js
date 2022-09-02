@@ -38,7 +38,9 @@ const Blog = ( props ) => {
 			className='blog'
 		>
 			<div>
-				<p>
+				<p
+					className='blog-title'
+				>
 					{blog.title} - {blog.author}
 					<button
 						onClick={toggleVisibility}
