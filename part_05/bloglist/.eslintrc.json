@@ -2,7 +2,8 @@
 	"env": {
 		"browser": true,
 		"es6": true,
-		"jest": true
+		"jest": true,
+		"cypress/globals": true
 	},
 	"extends": [ 
 		"eslint:recommended",
@@ -16,7 +17,7 @@
 		"sourceType": "module"
 	},
 	"plugins": [
-		"react", "jest"
+		"react", "jest", "cypress"
 	],
 	"rules": {
 		"indent": [
