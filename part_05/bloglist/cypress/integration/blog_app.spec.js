@@ -38,4 +38,16 @@ describe('Blog app', function() {
 			cy.get('html').should('not.contain', 'Superuser Blog logged-in');
 		});
 	});
+
+	describe('when logged in', function() {
+		beforeEach(function() {
+			cy.login({ username: 'root', password: 'root' });
+		});
+
+		it('a new blog can be created', function() {
+			cy.contains('create new blog').click();
+			cy.createBlog({ title: 'React patterns', author: 'Michael Chan', url: 'https://reactpatterns.com/' });
+			cy.contains('React patterns - Michael Chan');
+		});
+	});
 });
